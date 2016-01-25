@@ -1,0 +1,27 @@
+.container.col-lg-8.col-lg-offset-2
+  .well
+    %h1 please enter below information
+    = form_for @contragent do |f|
+      = f.label :corporate_form, "Enter corporate form"
+      = f.text_field :corporate_form, class: 'form-control'
+      %br/
+      = f.label :name, "enter name of contragent"
+      = f.text_field :name, class: 'form-control'
+      %br/
+      = f.fields_for :contragent_profile do |cp|
+        = cp.label :address
+        = cp.text_field :address, class: 'form-control'
+        %br/
+        = cp.label :director
+        = cp.text_field :director, class: 'form-control'
+        %br/
+        = cp.label :bank_account
+        = cp.text_field :bank_account, class: 'form-control'
+        %br/
+        = cp.label :postal_address
+        = cp.text_field :postal_address, class: 'form-control'
+        %br/
+        = cp.label :contacts
+        = cp.text_field :contacts, class: 'form-control'
+        %br/
+      = f.submit "submit"

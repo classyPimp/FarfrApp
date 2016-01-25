@@ -1,0 +1,42 @@
+<div>
+  <%= "you're logged in" if logged_in? %>
+</div>
+<div>
+  <%= link_to "LOGOUT", logout_path, method: :delete if logged_in? %>
+</div>
+
+
+
+<div class="col-md-offset-2 col-md-4">
+  <div class="sign-up-box">
+    <div id="signup-invitation">
+      <div class="error_messages" style="visible:none">
+        <% if @user.errors.any?%>
+          <%= @user.errors.full_messages.each do |message| %>
+            <p><%= message %></p>
+          <% end %>
+        <% end %>
+      </div>
+      <h4>Please enter your credentials to sign up</h4>
+    </div>
+    <%= form_for @user do |f| %>
+      <%= f.label :name, "Enter your name" %>
+      <%= f.text_field :name, class: "form-control input-sm chat-input", placeholder: "name" %>
+    <br>
+      <%= f.label :email, "enter email" %>
+      <%= f.text_field :email, class: "form-control input-sm chat-input", placeholder: "email" %>
+    <br>
+      <%= f.label :password, "password (length > 3 )" %>
+      <%= f.password_field :password, class: "form-control input-sm chat-input", placeholder: "password" %>
+    <br>
+      <%= f.label :password_confirmation, "Confirm password" %>
+      <%= f.password_field :password_confirmation, class: "form-control input-sm chat-input", placeholder: "password_confirmation" %>
+    <br>
+    <div class="wrapper">
+      <span class="group-btn">
+        <%= f.submit "submit", class: "btn btn-primary btn-md" %>
+      </span>
+    </div>
+    <% end %>
+  </div>
+</div>

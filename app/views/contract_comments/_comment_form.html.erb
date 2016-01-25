@@ -1,0 +1,16 @@
+<br>
+<div class="comment-box">
+<%= form_for [@contract, @comment], remote: true, method: :post, data: {type: :json} do |c| %>
+  <%= c.label :body, "enter your text below" %>
+  <%= c.text_area :body, class: "form-control" %>
+  <%= c.text_field :parent_id, value: 0, type: "hidden" %>
+  <%= c.text_field :read, value: 0, type: "hidden"%>
+  <%= c.text_field :parent_node, value: 0, type: "hidden" %>
+  <%= c.text_field :satisfied, value: 0, type: "hidden" %>
+  <%= c.text_field :contract_id, value: @contract.id, type: "hidden" %>
+  <%= c.text_field :user_id, value: current_user.id, type: "hidden" %>
+  <br>
+  <%= c.submit "submit comment", id: "submit-comment", class: "btn btn-success"%>
+  <button class="cancel-reply" style="display:none" >Cancel reply</button>
+<% end %>
+</div>

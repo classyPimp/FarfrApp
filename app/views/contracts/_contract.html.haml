@@ -1,0 +1,19 @@
+%tr
+  %td
+    = link_to "<i class='fa fa-share'>&nbsp;#{contract.number}</i>".html_safe, contract
+  %td 
+    = contract.date
+  %td 
+    = contract.subject
+  %td 
+    = contract.short_description
+  %td
+    - contract.contragents.each do |a|
+      = link_to "<i class='fa fa-share'>&nbsp;#{a.name}</i>".html_safe, a
+      %br
+  %td
+    - contract.attachments.each do |a|
+      = link_to "<i class='fa fa-file'>&nbsp;#{a.document_file_name}</i>".html_safe, a.document.url
+      %br
+  %td 
+    = contract.approved ? contract.approved : 'NO'

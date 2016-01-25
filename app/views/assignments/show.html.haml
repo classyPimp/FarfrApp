@@ -1,0 +1,110 @@
+.assignment-container.container
+  %table.table.table-striped.table-bordered.table-hover.table-responsive
+    %caption 
+      assignment details
+    %thead
+      %th
+        short desription
+      %th
+        description
+      %th
+        deadline
+      %th 
+        completion confirmation
+    %tbody
+      %td
+        = @assignment.short_description
+      %td
+        = @assignment.assignment_details
+      %td
+        = @assignment.deadline
+      %td
+        - if @assignment.completion_confirmed != nil
+          = @assignment.completion_confirmed
+        - else
+          - if @assignment.user.id == current_user.id
+            = form_for @assignment, url: assignment_path(@assignment, completion_confirmed: true) do |a|
+              = a.hidden_field :completion_confirmed, value: 'to_update'
+              = a.hidden_field :user_id, value: current_user.id
+              = a.submit 'confirm completion'
+          - else 
+            = 'no'
+  %br/
+
+  %table.table.table-striped.table-bordered.table-hover.table-responsive
+    %caption
+      assignment attachments
+    %thead
+      %th
+        file
+      %th
+        file description
+    %tbody
+      - if @assignment.attachments.size > 0
+        - @assignment.attachments.each do |a|
+          %td
+            = link_to a.attachment_file_name, a.attachment.url
+          %td
+            = a.description
+
+  %br/
+
+  %table.table.table-striped.table-bordered.table-hover.table-responsive
+    %caption
+      assignee details and reports
+    %thead
+      %th
+        assignee
+      %th
+        notified
+      %th
+        reports
+      
+    %tbody
+      - @assignment.assignees.each do |a|
+        %td
+          = a.user.name
+        %td
+          = a.notified
+        %td.col-md-6
+          %table.table.table-striped.table-bordered.table-hover.table-responsive
+            %tbody
+              - if a.attachments.size > 0
+                - a.attachments.each do |aa|
+                  %tr
+                    %td
+                      = link_to aa.attachment_file_name, aa.attachment.url
+                    %td
+                      = aa.description
+                    %td
+                      = aa.created_at 
+
+
+
+- if @assignment.assignees.pluck(:user_id).include? current_user.id 
+  = render 'assignee_panel'
+
+%div
+  = button_to "Get comments", [:comments, format: :json, commentable_id: @assignment.id, commentable_type: @assignment.class.to_s], form_class: :get_regular_comments, class: "get_comments col-lg-12 btn btn-primary", remote: :true, data: {type: :json}, method: :get
+.container
+  .comments
+
+%br/
+
+.comment-box
+  = form_for @assignment.comments.build, remote: true, method: :post, data: {type: :json} do |c|
+    = c.label :body, "enter your text below"
+    = c.text_area :body, class: "form-control"
+    = c.hidden_field :parent_id, value: 0
+    = c.hidden_field :parent_node, value: 0
+    = c.hidden_field :commentable_id, value: @assignment.id
+    = c.hidden_field :commentable_type, value: @assignment.class.to_s
+    = c.hidden_field :user_id, value: current_user.id, type: "hidden"
+    %br/
+    = c.submit "submit comment", id: "submit-comment", class: "btn btn-success"
+    %button.cancel-reply{:style => "display:none"} Cancel reply
+
+        
+
+
+

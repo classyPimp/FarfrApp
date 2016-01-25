@@ -1,0 +1,17 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  contragent_id: 
+  address: MyString
+  director: MyString
+  bank_account: MyString
+  postal_address: MyString
+  contacts: MyString
+
+two:
+  contragent_id: 
+  address: MyString
+  director: MyString
+  bank_account: MyString
+  postal_address: MyString
+  contacts: MyString

@@ -1,0 +1,30 @@
+.filed-assignmnents
+  %button.btn-info.btn#search-assignments
+    opensearchform
+    %i.fa.fa-search
+
+  .search-form
+    = form_for :q, url: assignments_path(search: true), method: :get do |f|
+      = f.label :completion_confirmed_not_null, 'completed'
+      = f.check_box :completion_confirmed_not_null, class: 'checkbox'
+      = f.label :completion_confirmed_null, 'uncompleted'
+      = f.check_box :completion_confirmed_null, class: 'checkbox'
+      = f.label :assignees_user_id_in, 'by assignee'
+      = f.select :assignees_user_id_in, ViewServices::User.users_for_select, {include_blank: true}, selected: nil
+      = f.label :created_at_gt, 'filed after'
+      = f.date_field :created_at_gt
+      = f.label :completion_confirmed_gt, 'completed since'
+      = f.date_field :completion_confirmed_gt
+      = f.submit
+  
+  %table.table.table-striped.table-bordered.table-hover.table-resposive
+    %caption
+      filed assignments
+    %tr
+      %th short description
+      %th assignees
+      %th deadline
+      %th completed
+    %tbody
+      = render @assignments unless @assignments.blank?
+

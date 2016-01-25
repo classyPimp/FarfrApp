@@ -1,0 +1,19 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  confirmable_id: 1
+  confirmable_type: MyString
+  type: 
+  initiator: 1
+  confirmator: 1
+  confirmator_note: MyString
+  confirmed: 2015-03-19 20:12:52
+
+two:
+  confirmable_id: 1
+  confirmable_type: MyString
+  type: 
+  initiator: 1
+  confirmator: 1
+  confirmator_note: MyString
+  confirmed: 2015-03-19 20:12:52

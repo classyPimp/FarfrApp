@@ -1,0 +1,9 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  corporate_form: MyString
+  name: MyString
+
+two:
+  corporate_form: MyString
+  name: MyString

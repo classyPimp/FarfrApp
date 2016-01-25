@@ -1,0 +1,2 @@
+module ContractKeptAtConfirmationHelper
+end

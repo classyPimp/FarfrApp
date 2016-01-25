@@ -1,0 +1,20 @@
+.col-md-4
+  %p
+    %button.btn.file-report.center
+      file report
+.assignee_panel.col-md-8{style: 'display:none'}
+  %p
+  = nested_form_for [@assignment, (@assignment.assignees.select{|o| o.user_id == current_user.id}).first], multipart: true do |f|
+    = f.hidden_field :user_id, value: current_user.id
+    %h4
+      upload reports
+    = f.fields_for :attachments, f.object.attachments.build do |fa|
+      = fa.label :attachment, 'upload your report', class: 'control-label'
+      = fa.file_field :attachment, class: 'form-control'
+      = fa.label :description, 'enter description', class: 'control-label'
+      = fa.text_area :description, class: 'form-control'
+      = fa.link_to_remove 'remove file'
+    = f.link_to_add 'add attachments',:attachments
+    %br/
+    = f.submit 'submit', class: 'btn btn-success'
+%br/

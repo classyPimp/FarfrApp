@@ -1,0 +1,92 @@
+%div
+  %button.btn.btn-info.col-md-6.col-md-offset-3#show-after-approval-actions
+    add aditional info
+
+  .after_approval_container.container-fluid.well{style: "display:none"}
+    .row.col-md-6.col-md-offset-3
+    .row
+      .col-md-4
+        - unless @contract.signed_by_company
+          %button.btn.btn-success.col-md-12.after_approval_form_btn{data:{form: ".div_set_signed_by_company"}}
+            set signed by company
+        - unless @contract.sent_to_contragent
+          %button.btn.btn-success.col-md-12.after_approval_form_btn{data:{form: ".set-sent-to-contragent"}}
+            set set to contragent
+        - unless @contract.recieved_from_contragent
+          %button.btn.btn-success.col-md-12.after_approval_form_btn{data:{form: ".set-recieved-from-contragent"}}
+            set when recieved from contragent
+        %button.btn.btn-success.col-md-12.after_approval_form_btn{data:{form: ".signed_scan_upload"}}
+          upload signed scans
+        - unless @contract.kept_at
+          %button.btn.btn-success.col-md-12.after_approval_form_btn{data:{form: ".kept_at_confirmation"}}
+            set where contract is stored 
+
+      .col-md-8.text-center.additional_info_form_box
+
+    .hidden_after_approval_forms{style: "display:none"}
+      /
+        this forms' data attr contains destination html elem to which response from json will be added by script
+      .div_set_signed_by_company.after-approval-form
+        %h4
+          set signed date
+        = form_for @contract, url: contract_path(@contract, set_signed_by_company: true), html: {role: "form", remote: true, data: {type: :json, destination: ".signed_by_company"}, class: "after_approval_form"} do |f|
+          = f.label :signed_by_company, "enter the date whe contract was signed by our company"
+          = f.date_field :signed_by_company, class: "form-control"
+          %br
+          =f.submit class: "btn btn-success btn-lg pull-right btn-xs"
+
+      .set-sent-to-contragent.after-approval-form
+        %h4
+          set sent to contragent
+        = form_for @contract, url: contract_path(@contract, set_sent_to_contragent: true), html: {role: "form", remote: true, data: {type: :json, destination: ".sent_to_contragent"}, class: "after_approval_form"} do |f|
+          = f.label :sent_to_contragent, "enter the date when contract was sent to contragent"
+          = f.date_field :sent_to_contragent, class: "form-control"
+          %br
+          = f.submit class: "btn btn-success btn-lg pull-right btn-xs"
+
+      .set-recieved-from-contragent.after-approval-form
+        %h4
+          set recieved from contragent
+        = form_for @contract, url: contract_path(@contract, set_recieved_from_contragent: true), html: {role: "form", remote: true, data: {type: :json, destination:".recieved_from_contragent"}, class: "after_approval_form"} do |f|
+          = f.label :recieved_from_contragent, "enter the date when contract was recieved from contragent"
+          = f.date_field :recieved_from_contragent, class: "form-control"
+          %br
+          = f.submit class: "btn btn-success btn-lg pull-right btn-xs"
+      
+      %h4
+        upload recieved signed contracts
+      .signed_scan_upload.after-approval-form
+        = nested_form_for @contract, url: contract_path(@contract, upload_signed_scans: true), html: {role: "form", remote: true, data: {type: :json, destination: ".signed_scan"}, multipart: true, class: "after_approval_form upload_signed_scans"}, authenticity_token: true, multiple: true do |f|
+          = f.fields_for :attachments, @contract.attachments.build do |cf|
+            .form_fields_to_clone
+              = cf.label :document, "choose file to upload"
+              = cf.file_field :document, class: "form-control file_field"
+              %br
+              = cf.hidden_field :is_scan, value: true, class: "is_scan"
+              = cf.link_to_remove "remove"
+          %br
+          = f.link_to_add "one more file", :attachments
+          = f.submit class: "btn btn-success btn-lg pull-right btn-xs"
+      .kept_at_confirmation.after-approval-form
+        %h4.text-center 
+          request storage confirmation
+        = form_for @contract, url: contract_path(@contract, request_kept_at_confirmation: true), html: {role: "form", remote: true, data:{type: :json, destination: ".kept_at"}, class: "after_approval_form"}, authenticity_token: true do |f|
+          - ckac =  ((x = @contract.contract_kept_at_confirmation) != nil) ? x : @contract.build_contract_kept_at_confirmation
+          = f.fields_for :contract_kept_at_confirmation, ckac do |cf|
+            = cf.hidden_field :initiator, value: current_user.id
+            = cf.fields_for :statuses, cf.object.statuses.build do |sa|
+              = sa.select :user_id, @approvers_for_select, {include_blank: true}, class: "form-control"
+          %br/
+          = f.submit "request", class: "btn btn-success btn-lg pull-right btn-xs"
+%br/
+
+
+  
+    
+
+
+
+
+
+
+  

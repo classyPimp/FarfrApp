@@ -1,0 +1,48 @@
+= wicked_pdf_stylesheet_link_tag "application"
+= wicked_pdf_javascript_include_tag "application"
+
+%table.table.table-striped.table-bordered.table-hover.table-responsive
+  %caption
+    Contract ##{@contract.number}
+  %thead
+    %tr
+      %th number
+      %th contract date
+      %th subject
+      %th description
+      %th contragents
+      %th files
+
+  %tbody
+    %tr
+      %td= @contract.number
+      %td= @contract.date
+      %td= @contract.subject
+      %td= @contract.short_description
+      %td
+        - @contract.contragents.each do |c|
+          = link_to c.name, c
+          %br
+      %td
+        - @contract.attachments.each do |a|
+          = link_to a.document_file_name , a.document.url
+          %br
+
+%table.table.table-striped.table-bordered.table-hover.table-responsive.approval-table
+  %caption Approval information
+  %thead
+    %tr
+      %th Worker
+      %th Approved
+      %th Notified
+  %tbody
+    - @contract.approvers.each do |ap|
+      %tr
+        %td= ap.user.name
+        - if current_user.id == ap.user_id && ap.approved.nil?
+          %td.approval-cell{:id => "approval-cell-#{ap.id}"}
+            = link_to contract_path(@contract, approve: :true, format: :json), remote: true, method: :put, data: {type: :json}, class: "approve-contract" do
+              %button.btn.btn-default.approve-contract{:type => "button"} approve
+        - else
+          %td= ap.approved or 'NO'
+        %td= ap.notified or 'NO'

@@ -1,0 +1,24 @@
+.panel-heading  
+  %p 
+    You have: all unapproved
+    %span.badge #{unapproved_contracts_for_current_user[:unapproved_counter]}
+    new unapproved: 
+    %span.badge #{unapproved_contracts_for_current_user[:unnotified_ids].count} new!
+    = link_to [current_user, :contract_approver], data: {type: "html"},remote: true, class: "refresh_unapproved_contracts_for_user" do
+      %i.fa.fa-refresh
+        refresh
+
+    = link_to [current_user, :contract_approver, contract_ids: (unapproved_contracts_for_current_user[:unnotified_ids])], method: "PUT", remote: true, id: "show_unapproved_contracts_for_user" do
+      %i{class:"fa fa-arrow-circle-o-down fa-lg pull-right fa-2x"} 
+        show
+.panel-body.unapproved-contracts-panel{style: "display:none"}
+  .unapproved-contracts
+    - unapproved_contracts_for_current_user[:contracts].each do |contract|
+      = link_to (contract.number || "no number" + " #{contract.subject}"), contract
+      - if contract.visited.nil?
+        %span.pull-right.badge
+          unvisited
+      - if (contract.approvers.select {|c| c.user_id == current_user.id}).first.notified.blank?
+        %span.pull-right.badge
+          new 
+      %br

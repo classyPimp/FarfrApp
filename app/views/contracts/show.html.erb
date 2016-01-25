@@ -1,0 +1,136 @@
+<table class="table table-striped table-bordered table-hover table-responsive">
+  <caption>Contract #<%= @contract.number %></caption>
+  <thead>
+    <tr>
+      <th>number</th>
+      <th>contract date</th>
+      <th>subject</th>
+      <th>description</th>
+      <th>contragents</th>
+      <th>files</th>
+
+      <th>signed by company</th>
+      <th>sent to contragent</th>
+      <th>recieved from contragent</th>
+      <th>signed scans</th>
+      <th>original stored at</th>
+      <!--<th>approval information</th> -->
+    </tr>
+
+  </thead>
+  <tbody>
+    <tr>
+      <td><%= @contract.number %></td>
+      <td><%= @contract.date %></td>
+      <td><%= @contract.subject %></td>
+      <td><%= @contract.short_description %></td>
+      <td>   
+        <% @contract.contragents.each do |c| %>            
+          <%= link_to c.name, c %><br>
+        <% end %>
+      </td>
+      <td>
+        <% if current_user.id != @contract.executor.user_id %>
+          <% @contract.attachments.each do |a| %>
+            <%= (link_to (a.is_final == true) ? a.document_file_name + '**final' : a.document_file_name, a.document.url) if a.is_scan.nil? %> <br>
+          <% end %>
+           <br>
+        <% else %>
+          <%= nested_form_for @contract, multipart: true do |f| %>
+            <%= f.fields_for :attachments do |ca| %>
+              <%= (link_to (ca.object.is_final == true) ? ca.object.document_file_name + '**final' : ca.object.document_file_name, ca.object.document.url) if (x= ca.object.is_scan) == false || x == nil %>
+              <%= (ca.hidden_field :id) if x == false || x == nil %>
+              <%= (ca.check_box :is_final, {}, 1, 0) if x == false || x == nil%>
+            <% end %>
+            <%= f.submit 'mark/unmark as final e-version' %>
+          <% end %>
+          <%= nested_form_for @contract, multipart: true do |f| %>
+            <%= f.fields_for :attachments, @contract.attachments.build do |a|%>
+              <%= a.file_field :document %>
+              <%= a.hidden_field :is_project, value: true %>
+            <% end %>
+            <%= f.submit %>
+          <% end %>
+        <% end %>
+      </td>
+      <td class="signed_by_company"> <%= @contract.signed_by_company || 'no' %> </td>
+      <td class="sent_to_contragent"> <%= @contract.sent_to_contragent || 'no' %></td>
+      <td class="recieved_from_contragent"> <%= @contract.recieved_from_contragent || 'no' %> </td>
+      <td class="signed_scan"> 
+        <% csatmnt = @contract.attachments.select {|c| c.is_scan != nil} %>
+        <%= "no" if csatmnt.blank? %>
+        <% csatmnt.each do |a| %> 
+          <%=  link_to a.document_file_name, a.document.url %> <br>
+        <% end %>
+      </td>
+      <td class="kept_at">
+        <p><%= User.select(:name).find(@contract.kept_at).name unless @contract.kept_at.blank? %></p> 
+        <% unless @view_service.pending_confirmations[:kept_at].blank? %>
+          <p>Confirmation for storage was requested for <%= @view_service.pending_confirmations[:kept_at].last.statuses.first.user.name %> </p>  
+        <% end %>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<div>
+<%= render "after_approval_actions" if check_executor_and_approved_for_loaded_contract(@contract)  %>
+</div>
+<button type="button" class="btn btn-default col-lg-12" id="show-approval">Show approvals</button>
+<table class="table table-striped table-bordered table-hover table-responsive approval-table" style="display:none">
+  <caption>Approval information</caption>
+  <thead>
+    <tr>
+      <th>Worker</th>
+      <th>Approved</th>
+      <th>Notified</th>
+      <th>Previous approvals</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @contract.approvers.each do |ap| %>
+      <tr>
+        <td><%= ap.user.name %><br><%= "executor" unless ap.is_executor.blank? %></td>
+        <% if current_user.id == ap.user_id && ap.approved.nil? %>
+          <td id="approval-cell-<%= ap.id %>" class="approval-cell">
+          <% #TODO: use button_to here instead of link_to %>
+            <%= link_to contract_path(@contract, approve: :true, format: :json), remote: true, method: :put, data: {type: :json}, class: "approve-contract" do %>
+              <button type="button" class="btn btn-default approve-contract">approve</button>
+            <% end %>  
+          </td>
+        <% else %>  
+          <td><%= ap.approved or 'NO'%></td>    
+        <% end %>
+        <td><%= ap.notified or 'NO' %></td>
+        <td>
+          <% if ap.log[:previously_approved] != nil %>
+            <% ap.log[:previously_approved].each do |pa| %>
+              <%= pa %><br>
+            <% end %>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<div>
+  <%= button_to contract_path(@contract, format: :pdf), method: :get,  class: "btn btn-success col-lg-12" do %>
+    generate approval list <i class='fa fa-file-pdf-o'></i>
+  <% end %>
+</div>
+<div>
+  <%= render 'edit_contract' %>
+</div>
+<% #IMPORTANT reminder comments are all remote, they are rendered #by js including representation %>
+<div>
+ <%= button_to "Get comments", [@contract, :contract_comments, format: :json], form_class: :get_comments, class: "get_comments col-lg-12 btn btn-primary", remote: :true, data: {type: :json}, method: :get %>
+</div>
+<br>
+<div class="container">
+  <div class="comments"></div>
+  <br>
+  <div class="row col-md-12 center-block">
+    <%= render "contract_comments/comment_form" %>
+  </div>
+</div>

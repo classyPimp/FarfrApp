@@ -1,0 +1,53 @@
+%button.btn-info.btn#search-form
+  open search form
+  %i.fa.fa-search
+
+.search-contracts{style: "display:none"}
+  = form_for :contract_search, url: contracts_path, method: :get do |cs|
+    = cs.label :number, "search by number", class: "control-label"
+    = cs.text_field :number, class: "form-control" 
+    = cs.label :date_from, "search from ...", class: "control-label"
+    = cs.date_field :date_from, class: "form-control"
+    = cs.label :date_to, "search to ...", class: "control_label"
+    = cs.date_field :date_to, class: "form-control"
+    = cs.label :contragent, "search by contragent"
+    = cs.text_field :contragent, class: "form-control"
+    = cs.label :subject, "search by subject", class: "control_label"
+    = cs.text_field :subject, class: "form-control"
+    = cs.label :description, "search by description", class: "control_label"
+    = cs.text_field :description, class: "form-control"
+    = cs.label :approved, "include approved"
+    = cs.check_box :approved, class: "checkbox", checked: true
+    = cs.label :unapproved, "include unapproved"
+    = cs.check_box :unapproved, class: "checkbox"
+    = cs.label :template, "search template contracts"
+    = cs.check_box :template, class: "checkbox"
+    = cs.label :executor, "search by executor"
+    = cs.select :executor, @approvers_for_select, {include_blank: true}, selected: nil
+    %br
+    %button.btn.btn-success.pull-right{type: "submit"}
+      %i.fa.fa-search
+      Search!
+  %button.btn.btn-danger#cancel-search
+    %i.fa.fa-times
+    cancel search 
+
+%table.table.table-striped.table-bordered.table-hover.table-resposive
+  %caption
+    contracts
+  %tr
+    %th number
+    %th contract date
+    %th subject
+    %th description
+    %th contragents
+    %th files
+    %th approved on
+  %tbody
+    = render @contracts
+    = will_paginate @contracts 
+         
+
+
+      
+

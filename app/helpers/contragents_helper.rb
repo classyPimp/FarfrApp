@@ -1,0 +1,2 @@
+module ContragentsHelper
+end

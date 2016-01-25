@@ -1,0 +1,128 @@
+.panel.panel-default.unapproved_contracts_for_user 
+  = render "unapproved_contracts_for_user"
+//todo can be moved to partial
+.panel.panel-default.users_contracts_links
+  .panel-heading 
+    %p 
+      my contracts
+      %i.fa.fa-times.pull-right.toggle_contracts_links_panel
+        
+
+  .panel-body.users_contracts_links_panel_body
+    = link_to "all of my contracts where I am executor", contracts_path(contract_search:{executor: current_user.id})
+    %br
+    = link_to "all of my unapproved contracts where i'm executor", contracts_path(contract_search:{executor: current_user.id, unapproved: 1})
+    %br
+    = link_to "all of my approved contracts where i'm executor", contracts_path(contract_search:{executor: current_user.id, approved: 1})
+    %br
+    = link_to "all template contracts", contracts_path(contract_search:{template: 1})
+
+.panel.panel-default.users_notifications_panel
+  .panel-heading
+    %p
+      notifications 
+      %span.badge
+        - unless @notifications.blank?
+          +
+          %span.notifications_count
+            #{@notifications.to_a.count.to_s}
+          new 
+        - else
+          no new notifications
+
+  .panel-body.users_notifications
+    %p
+      link
+      %span.pull-right
+        set read
+
+    - unless @notifications.blank?
+      %input#set_read_checkboxes.pull-right{type: "checkbox"}
+      %br
+      = form_for :user_notifications, url: user_user_notifications_mass_update_path(current_user.id), method: :put, remote: true, html: {class: "user_notifications_form"}, data:{type: :json} do |f|
+        - @notifications.each do |user_notification|
+          %div.single_notification
+            - x = user_notification.subject.split(':')
+            - type = x[0]; subtype = x[1]
+            - if type == 'contract' && subtype == 'kept_at_confirmation'
+              = link_to "kept at storage was confirmed for #{x = Contract.find(user_notification.link); x.number}", x
+            - elsif type == 'contract' && subtype == 'is_project_uploaded'
+              = link_to "new version of document uploaded that needs to be approved for #{x = Contract.find(user_notification.link); x.number}", x
+            - elsif type == 'contract' && subtype == 'comment_satisfied'
+              = link_to "objection was dismissed for #{x = Contract.find(user_notification.link); x.number}", x
+            - elsif type == 'assignment' && subtype == 'created'
+              = link_to "new assignment was filed by #{x = Assignment.find(user_notification.link);  x.user.name}", x 
+            - elsif type == 'assignee' && subtype == 'report_filed'
+              = link_to "report was filed by #{x = Attachment.find(user_notification.link); x.attachable.user.name}", x.attachable.assignment
+            - elsif type == 'assignment' && subtype == 'completion_confirmed'
+              = link_to "assignments completion was confirmed by #{x = Assignment.find(user_notification.link); x.user.name}", x
+            - else
+              %a{:href => user_notification.link}
+                = user_notification.subject
+            %span.pull-right
+              = f.check_box :notification_ids, {multiple: true, class: "notification_checkbox"}, user_notification.id, 0
+          %br
+        = f.submit "set read"
+    - else
+      = "there are no notifications"
+
+.panel.panel-default.users_confirmations_panel
+  .panel-heading
+    %p
+      confirmation request
+      %span.badge
+        - unless @confirmations.blank?
+          +
+          %span.confirmations_count
+            #{@confirmations.to_a.count.to_s}
+        - else
+          %span.confirmations_count
+            0  
+  .panel-body.users_confirmations
+    = form_for :contract_kept_at_confirmation, url: contract_kept_at_confirmations_mass_update_path, method: :put, remote: true, html: {id: "confirmations"} do |f|
+      - @confirmations.each do |n|
+        .confirmation-request-box{data:{confirmation_id: n.confirmation_id}}
+          = n.confirmation.initiator_user.name
+          requested confirmation that you store the contract
+          - t_contract = n.confirmation.confirmable
+          = link_to t_contract.number, contract_path(t_contract.id)
+          %span.pull-right
+            = f.check_box :confirmations_ids, {multiple: true, class: "confirmations_checkbox"}, n.id, 0
+
+      = f.submit "confirm storage"
+       
+.panel.panel-default.user_assignments_panel
+  .panel-heading
+    %p
+      assignments
+      %span.badge
+        - x = @user.uncompleted_assignments.select(:id, :short_description, :deadline); x.includes(:user, :assignees).where(assignees: {user_id: current_user.id})
+        - unless @user.uncompleted_assignments.size < 1
+          all
+          %span.assignments_count
+            #{@user.uncompleted_assignments.size}
+          new
+          %span.assignments_new_count
+            #{ (@user.uncompleted_assignments.select { |o| o.assignees.first.notified == nil }).size }
+
+
+  .panel-body.user_assignments
+    - @user.uncompleted_assignments.each do |a|
+      %td
+        - if a.assignees.first.visited == nil
+          %span.badge
+            unvisited
+        - if a.assignees.first.notified == nil
+          %span.badge
+            new
+      %td
+        = a.user.name
+      %td
+        = link_to a.short_description, a
+      %td
+        = a.deadline
+      %br/
+
+
+
+

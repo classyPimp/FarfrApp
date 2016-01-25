@@ -1,0 +1,5 @@
+<% if defined?(@template) %>
+  <%= render "template_form" if defined?(@template) %>
+<% else %>
+  <%= render "form" %>
+<% end %>

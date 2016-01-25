@@ -1,0 +1,36 @@
+.create_assignment_container
+  %p
+    fill in form to create assignment
+  = nested_form_for @assignment, multipart: true do |a|
+    
+    - if @assignment.errors.any?
+      %div#error_explanation
+      %ul
+        - @assignment.errors.full_messages.each do |message|
+          %li
+            = message
+
+    = a.label :short_description, 'enter short description', class: 'control-label'
+    = a.text_field :short_description, class: 'form-control'
+    = a.label :assignment_details, 'enter details', class: 'control-label'
+    = a.text_area :assignment_details, class: 'form-control'
+    = a.label :deadline, 'define deadline',class: 'control-label'
+    = a.date_field :deadline, class: 'form-control'
+    = a.label :report_form, 'select the report form', class: 'control-label' 
+    = a.select :report_form, @assignment.class::REPORT_FORMS, class: 'form-control'
+
+    = a.fields_for :assignees, @assignment.assignees.build do |ae|
+      = ae.label :user_id, 'choose executor'
+      = ae.select :user_id, User.select(:name, :id).all.collect { |user| [user.name, user.id] }, {include_blank: true}
+      = ae.link_to_remove 'remove this'
+    = a.link_to_add 'add more executors', :assignees
+
+    = a.fields_for :attachments, @assignment.attachments.build do |am|
+      = am.label :attachment, 'upload file', class: 'control-label'
+      = am.file_field :attachment, class: 'form-control'
+      = am.label :description, 'enter description to file', class: 'control-label'
+      = am.text_field :description, class: 'form-control'
+      = am.link_to_remove 'remove this'
+    = a.link_to_add 'add more files', :attachments
+    = a.submit 'create assignment'
+

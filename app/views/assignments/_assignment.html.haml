@@ -1,0 +1,15 @@
+%tr
+  %td 
+    = link_to assignment.short_description, assignment
+  %td 
+    - assignment.assignees.each do |assignee|
+      = assignee.user.name
+      %br/
+  %td
+    = assignment.deadline 
+  %td
+    - if assignment.completion_confirmed != nil
+      = assignment.completion_confirmed
+    - else
+      no
+

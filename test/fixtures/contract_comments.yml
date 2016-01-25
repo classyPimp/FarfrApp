@@ -1,0 +1,21 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  contract_id: 
+  user_id: 
+  parent_id: 
+  parent_node: 1
+  satisfied: MyString
+  read: MyString
+  log: MyText
+  claims: MyText
+
+two:
+  contract_id: 
+  user_id: 
+  parent_id: 
+  parent_node: 1
+  satisfied: MyString
+  read: MyString
+  log: MyText
+  claims: MyText
