@@ -124,7 +124,7 @@
 </div>
 <% #IMPORTANT reminder comments are all remote, they are rendered #by js including representation %>
 <div>
- <%= button_to "Get comments", [@contract, :contract_comments, format: :json], form_class: :get_comments, class: "get_comments col-lg-12 btn btn-primary", remote: :true, data: {type: :json}, method: :get %>
+ <%= button_to "press here for messages", [@contract, :contract_comments, format: :json], form_class: :get_comments, class: "get_comments col-lg-12 btn btn-primary", remote: :true, data: {type: :json}, method: :get %>
 </div>
 <br>
 <div class="container">

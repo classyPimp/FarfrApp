@@ -85,7 +85,7 @@
   = render 'assignee_panel'
 
 %div
-  = button_to "Get comments", [:comments, format: :json, commentable_id: @assignment.id, commentable_type: @assignment.class.to_s], form_class: :get_regular_comments, class: "get_comments col-lg-12 btn btn-primary", remote: :true, data: {type: :json}, method: :get
+  = button_to "press here to get messages", [:comments, format: :json, commentable_id: @assignment.id, commentable_type: @assignment.class.to_s], form_class: :get_regular_comments, class: "get_comments col-lg-12 btn btn-primary", remote: :true, data: {type: :json}, method: :get
 .container
   .comments
 
